@@ -1,0 +1,12 @@
+---
+- name: Shutdown Gitea to prepare for Updating
+  hosts: gitea_servers
+  become: true
+  tasks: 
+    - name: Check for Gitea Executable PIDs (Returns list of PIDs)
+      community.general.pids:
+        name: "{{ gitea_path }}"
+      register: gitea_pid
+    - name: Print list of pids
+      ansible.builtin.debug:
+        var: gitea_pid
