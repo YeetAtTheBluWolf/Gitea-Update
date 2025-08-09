@@ -7,3 +7,7 @@ gitea_servers:
       gitea_config: "/etc/gitea/app.ini"
 gitea_runners:
   hosts:
+    x.x.x.x:
+      systemd_used: true
+      action_runner_path: "/usr/local/bin/act_runner"
+      action_work_path: "/var/lib/act_runner"
