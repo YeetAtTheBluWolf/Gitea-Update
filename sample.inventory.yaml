@@ -1,0 +1,9 @@
+gitea_servers:
+  hosts:
+    x.x.x.x:
+      systemd_used: true
+      gitea_path: "/usr/local/bin/gitea"
+      gitea_work_path: "/var/lib/gitea"
+      gitea_config: "/etc/gitea/app.ini"
+gitea_runners:
+  hosts:
