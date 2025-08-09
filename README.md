@@ -11,3 +11,6 @@ This project uses the AGPL-3.0 License.
 
 https://docs.gitea.com/installation/install-from-binary#troubleshooting
 
+### More to come
+
+I'm going to package this repository with overarching repository with other utilities like this.
