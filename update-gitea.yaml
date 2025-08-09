@@ -3,10 +3,16 @@
   hosts: gitea_servers
   become: true
   tasks: 
+    - name: Stop the Gitea Service
+      ansible.builtin.systemd_service:
+        name: "gitea"
+        state: "stopped"
     - name: Check for Gitea Executable PIDs (Returns list of PIDs)
       community.general.pids:
         name: "{{ gitea_path }}"
       register: gitea_pid
+      when: systemd_used == false
     - name: Print list of pids
       ansible.builtin.debug:
         var: gitea_pid
+      when: systemd_used == false
