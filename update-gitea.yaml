@@ -1,19 +1,32 @@
 ---
-# TEST COMMENT
 - name: Shutdown Gitea to prepare for Updating
   hosts: gitea_servers
   become: true
   tasks: 
-    - name: Stop the Gitea Service
+    - name: Stop the Gitea Service using Systemd
       ansible.builtin.systemd_service:
         name: "gitea"
         state: "stopped"
+      tags: systemd
     - name: Check for Gitea Executable PIDs (Returns list of PIDs)
       community.general.pids:
         name: "{{ gitea_path }}"
       register: gitea_pid
-      when: systemd_used == false
+      tags: manual
     - name: Print list of pids
       ansible.builtin.debug:
         var: gitea_pid
-      when: systemd_used == false
+      tags:
+        - debug
+        - manual
+    - name: Stopping the process using the kill command
+      ansible.builtin.command: "/usr/bin/kill {{ item }}"
+      loop: "{{ gitea_pid.pids | list }}"
+      tags: manual
+    - name: Create a backup using gitea dump function
+      ansible.builtin.command: "{{ gitea_path }} dump -c {{ gitea_config }}"
+      become: true
+      become_user: git
+      args:
+        chdir: "{{ backup_directory }}"
+      tags: backup
