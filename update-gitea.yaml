@@ -3,6 +3,14 @@
   hosts: gitea_servers
   become: true
   tasks: 
+    - name: Checks the Gitea version
+      ansible.builtin.command: "/usr/local/bin/gitea --version"
+      register: gitea_version
+      tags: debug
+    - name: Reports the Gitea version
+      ansible.builtin.debug:
+        var: gitea_version.stdout
+      tags: debug
     - name: Stop the Gitea Service using Systemd
       ansible.builtin.systemd_service:
         name: "gitea"
@@ -12,10 +20,12 @@
       community.general.pids:
         name: "{{ gitea_path }}"
       register: gitea_pid
-      tags: manual
+      tags: 
+        - manual
+        - debug
     - name: Print list of pids
       ansible.builtin.debug:
-        var: gitea_pid
+        var: gitea_pid.pids
       tags:
         - debug
         - manual
