@@ -1,22 +1,22 @@
 ---
-- name: Shutdown Gitea to prepare for Updating
+- name: Backing up and updating Gitea
   hosts: gitea_servers
   become: true
   tasks: 
     - name: Checks the Gitea version
-      ansible.builtin.command: "/usr/local/bin/gitea --version"
+      ansible.builtin.command: "{{ gitea_path }} --version"
       register: gitea_version
       tags: debug
     - name: Reports the Gitea version
       ansible.builtin.debug:
         var: gitea_version.stdout
       tags: debug
-    - name: Stop the Gitea Service using Systemd
+    - name: Stop the Gitea service using Systemd
       ansible.builtin.systemd_service:
         name: "gitea"
         state: "stopped"
       tags: systemd
-    - name: Check for Gitea Executable PIDs (Returns list of PIDs)
+    - name: Check for Gitea executable PIDs (Returns list of PIDs)
       community.general.pids:
         name: "{{ gitea_path }}"
       register: gitea_pid
@@ -40,3 +40,28 @@
       args:
         chdir: "{{ backup_directory }}"
       tags: backup
+    - name: Remove the current gitea installed
+      ansible.builtin.file:
+        path: "{{ gitea_path }}"
+        state: "absent"
+      tags: 
+        - manual
+        - systemd
+    - name: Download and install gitea using the provided link
+      ansible.builtin.get_url:
+        url: "{{ binary_download }}"
+        dest: "{{ gitea_path }}"
+        mode: '0755'
+        owner: "root"
+        group: "root"
+      tags: 
+        - manual
+        - systemd
+    - name: Start the Gitea service using Systemd
+      ansible.builtin.systemd_service:
+        name: "gitea"
+        state: "started"
+      tags: systemd
+    - name: Start the Gitea executable manually
+      ansible.builtin.command: "GITEA_WORK_DIR={{ gitea_work_path }} {{ gitea_path }} web -c {{ gitea_config }}" 
+      tags: manual

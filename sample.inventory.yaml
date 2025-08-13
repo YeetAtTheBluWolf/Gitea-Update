@@ -5,8 +5,11 @@ gitea_servers:
       gitea_work_path: "/var/lib/gitea"
       gitea_config: "/etc/gitea/app.ini"
       backup_directory: "/home/git/"
+      binary_download: "https://github.com/go-gitea/gitea/releases/download/v1.24.4/gitea-1.24.4-linux-amd64"
 gitea_runners:
   hosts:
     x.x.x.x:
       action_runner_path: "/usr/local/bin/act_runner"
       action_work_path: "/var/lib/act_runner"
+      backup_directory: "/home/git/"
+      binary_download: ""
